@@ -1,6 +1,4 @@
-import React from "react";
-
-import { useState } from "react";
+import React, { useState } from "react";
 import axios from "axios";
 
 export const Post = () => {
@@ -9,38 +7,49 @@ export const Post = () => {
     phoneNumber: "",
     email: "",
     message: "",
-    file: "",
+    file: null,
   });
 
   const handleChange = (e) => {
-    const value = e.target.value;
-    setState({
-      ...state,
-      [e.target.name]: value,
-    });
+    const { name, value } = e.target;
+    setState((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    setState((prevState) => ({
+      ...prevState,
+      file: file,
+    }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const userData = {
-      fullName: state.fullName,
-      phoneNumber: state.phoneNumber,
-      email: state.email,
-      message: state.message,
-      file: state.file,
-    };
+    const formData = new FormData();
+    formData.append("fullName", state.fullName);
+    formData.append("phoneNumber", state.phoneNumber);
+    formData.append("email", state.email);
+    formData.append("message", state.message);
+    formData.append("file", state.file);
+
     axios
-      .post("https://ccse.uicgroup.tech/api/v1/common/appeal/post/", userData)
+      .post("https://ccse.uicgroup.tech/api/v1/common/appeal/post/", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      })
       .then((response) => {
         console.log(response.status, response.data);
       });
   };
+
   return (
     <div>
-      <h1>Register or Create new account</h1>
+      <h1>New Post</h1>
       <hr />
       <form onSubmit={handleSubmit}>
-        <label htmlFor="name">
+        <label htmlFor="fullName">
           Name
           <input
             type="text"
@@ -49,7 +58,7 @@ export const Post = () => {
             onChange={handleChange}
           />
         </label>
-        <label htmlFor="number">
+        <label htmlFor="phoneNumber">
           Phone Number
           <input
             type="tel"
@@ -58,7 +67,7 @@ export const Post = () => {
             onChange={handleChange}
           />
         </label>
-        <label htmlFor="number">
+        <label htmlFor="email">
           Email
           <input
             type="email"
@@ -67,7 +76,7 @@ export const Post = () => {
             onChange={handleChange}
           />
         </label>
-        <label htmlFor="number">
+        <label htmlFor="message">
           Message
           <input
             type="text"
@@ -77,13 +86,8 @@ export const Post = () => {
           />
         </label>
         <label htmlFor="file">
-          Message
-          <input
-            type="file"
-            name="file"
-            value={state.file}
-            onChange={handleChange}
-          />
+          File
+          <input type="file" name="file" onChange={handleFileChange} />
         </label>
         <button type="submit">Submit</button>
       </form>
