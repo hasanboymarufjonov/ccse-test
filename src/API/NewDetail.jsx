@@ -56,6 +56,7 @@
 
 import React, { useEffect, useState, useCallback } from "react";
 import axios from "axios";
+import Fingerprint2 from "fingerprintjs2";
 
 function NewDetail() {
   const [data, setData] = useState(null);
@@ -100,6 +101,34 @@ function NewDetail() {
 
     return randomString;
   };
+  // const fpPromise = import("https://openfpcdn.io/fingerprintjs/v3").then(
+  //   (FingerprintJS) => FingerprintJS.load()
+  // );
+
+  // // Get the visitor identifier when you need it.
+  // fpPromise
+  //   .then((fp) => fp.get())
+  //   .then((result) => {
+  //     // This is the visitor identifier:
+  //     const visitorId = result.visitorId;
+  //     console.log(visitorId);
+  //   });
+
+  useEffect(() => {
+    const generateFingerprint = async () => {
+      try {
+        const components = await Fingerprint2.getPromise();
+        const values = components.map((component) => component.value);
+        const fingerprint = Fingerprint2.x64hash128(values.join(""), 31);
+        console.log(fingerprint);
+        // Do something with the generated fingerprint
+      } catch (error) {
+        console.error("Error generating fingerprint:", error);
+      }
+    };
+
+    generateFingerprint();
+  }, []);
 
   return (
     <div className="App">
